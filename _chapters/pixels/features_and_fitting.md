@@ -20,11 +20,16 @@ Straight lines characterize many objects around us. Here are few examples where 
 
 <!--- **Example 3: Computing vanishing points** -->
 
+Looking at these examples and intuitively thinking of line detection, few questions arise.
+- Once we have points that belong to a line, what is the line?
+- How many lines exist?
+- Which points belong to which line?
+
+_Note:_ Edge detection is a technique that is used to identify boundaries. It does not provide information on the orientation of pixels. For example, whether these pixels form a line or corner.
+
 ## Model Fitting
 
 We would like to form a higher-level succinct representation of the features in the image by grouping multiple features based on a simple model. This section focuses on lines described as one such model (i.e. line fitting) with edge points as features.
-
-_Note:_ Edge detection is a technique that is used to identify boundaries. It does not provide information on the orientation of pixels (shape).
 
 **Challenges**
 
@@ -32,29 +37,53 @@ As with any fitting problem, we ned to take into account missing information, no
 
 <<image slide 5>>
 
-Least squares regression is a common technique to find a line of best fit for a dataset. However, least squares is prone to the negative effect of outliers. When dealing with images it is often the case that the number of outliers is large. A better approach is to find a set of inliers to initiate model fitting.
+Least squares regression is a common technique to find a line of best fit for a dataset. However, least squares is prone to the negative effect of outliers. When dealing with images it is often the case that the number of outliers is large. A better approach is to find a set of inliers to initiate model fitting. In the next section, we'll explore such a technique that helps us find consistent matches.
 
-## Voting Scheme
+<<image https://en.wikipedia.org/wiki/Random_sample_consensus>>
+
+## Voting-based Fitting
 
 We could try to fit the model by exhausitively checking all combination of features. However, this approach is inefficient with O(N<sup>2</sup>) time complexity.
 
 Voting is a decent alternative. The idea is to have features vote for compatible models and to capture model parameters that form a majority. It turns out that this set of winning model parameters are not affected by votes from clutter and noisy features as their voting will be inconsistent with the consensus. The problem of missing observations can also be overlooked as the fitted model can span multiple fragments. In general, voting is considered to be robust to outliers and missing data.
 
-[Hough Transform](#edge_detection) uses this voting strategy for detecting lines. Check out this video for a quick review of Hough Transform:
+[Hough Transform](#edge_detection) uses this voting strategy for detecting lines. Check out this video for a quick review of Hough transform:
 
 https://www.youtube.com/watch?v=4zHbI-fFIlI&feature=youtu.be&t=3m35s
 
 <<image 4.6 slide 11>>
 
-## RANSAC
+## Random Sample Consensus (RANSAC)
+
+Both Hough transform and RANSAC rely on voting to arrive at the optimum model. The part where they differ is in how the model is chosen. As the name suggests, RANSAC introduces randomness in the model selection process. A number of models are proposed until one is found that is supported by a consensus of features (voters). Let's try to understand the algorithm.
 
 **Algorithm**
 
-**Walk-through**
+RANSAC algorithm was developed by Fischler and Bolles in 1981. Here's the gist:
 
-**Model parameters**
+1. Randomly sample a group of points required to fit the model
+2. Find model parameters using this sample
+3. Calculate the votes from the fraction of inliers within a predetermined threshold of the model
+4. Repeat steps 1-3 until model is found with high confidence
+
+** Algorithm Pseudocode **
+
+<<image slide 16>>
+
+**Model Parameters**
+
+The alogrithm can be tuned with the following parameters:
+
+- *n* &ndash minimum number of points required to estimate model parameters
+- *k* &ndash maximum number of iterations
+- *t* &ndash distance threshold to determine points that fit well to model
+- *d* &ndash number of close points required to assert a model fits well
+
+The parameter that needs most attention is *k* - number of iterations. Next, we'll see how to determine its value.
 
 **Estimate number of iterations**
+
+
 
 **Refined RANSAC**
 
