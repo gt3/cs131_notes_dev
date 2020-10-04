@@ -62,7 +62,7 @@ Both Hough transform and RANSAC rely on voting to arrive at the optimum model. T
 RANSAC algorithm was developed by Fischler and Bolles in 1981. Here's the gist:
 
 1. Randomly sample a group of points required to fit the model
-2. Find model parameters using this sample
+2. Find model parameters from this sample
 3. Calculate the votes from the fraction of inliers within a predetermined threshold of the model
 4. Repeat steps 1-3 until model is found with high confidence
 
@@ -76,14 +76,24 @@ RANSAC algorithm was developed by Fischler and Bolles in 1981. Here's the gist:
 
 The algorithm can be tuned with the following parameters:
 
-- *n* – minimum number of points required to estimate model parameters
-- *k* – maximum number of iterations
-- *t* – distance threshold to determine points that fit well to model
-- *d* – number of close points required to assert a model fits well
+- _n_ – minimum number of points required to estimate model parameters
+- _k_ – maximum number of iterations
+- _t_ – distance threshold to determine points that fit well to model
+- _d_ – number of close points required to assert a model fits well
 
-The parameter that needs most attention is *k* – number of iterations. Next, we'll see how to determine its value.
+The parameter that needs most attention is _k_ – number of iterations. Next, we'll see how to determine its value.
 
 **Estimate number of iterations**
+
+Random sampling requires a minimum number of samples to be drawn to provide a high confidence estimate of parameters. The number of samples largely depends on outliers and sample size. In other words, the number of iterations is directly proportional to noise in the data and complexity of the model. This can be described by the following probabilities:
+
+$$ \begin{equation} P_f = (1 - W^n)^k = 1 - p \end{equation} $$
+
+where _k_ is the number of samples,  _n_ is the minimum number of points required to estimate model parameters (2 parameters for line), _W_ is the fraction of inliers, and $P_f$ represents probability of k samples failing.
+
+Solving for _k_ gives us the minimum number of samples:
+
+$$ \begin{equation} k = \frac{\log(1 - p)}{\log(1 - W^n)} \end{equation} $$
 
 
 **Refined RANSAC**
