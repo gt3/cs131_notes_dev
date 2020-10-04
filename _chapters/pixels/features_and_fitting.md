@@ -29,7 +29,7 @@ We would like to form a higher-level succinct representation of the features in 
 
 **Challenges**
 
-As with any fitting problem, we ned to take into account missing information, noise, and outliers. Our solution should be able to detect the best fitting line from edge points that could have clutter and noise. It should also be able to detect lines that bridge missing evidence.
+As with any fitting problem, we need to take into account missing information, noise, and outliers. Our solution should be able to detect the best fitting line from edge points that could have clutter and noise. It should also be able to detect lines that bridge missing evidence.
 
 <div class="fig figcenter">
   <img src="{{ site.baseurl }}/assets/pixels/line-fitting-challenges.png">
@@ -43,7 +43,7 @@ Least squares regression is a common technique to find a line of best fit for a 
 
 ## Voting-based Fitting
 
-We could try to fit the model by exhausitively checking all combination of features. However, this approach is inefficient and bears a O(N<sup>2</sup>) time complexity.
+We could try to fit the model by exhaustively checking all combination of features. However, this approach is inefficient and bears a O(N<sup>2</sup>) time complexity.
 
 Voting is a decent alternative. The idea is to have features vote for compatible models and to capture model parameters that form a majority. It turns out that this set of winning model parameters are not affected by votes from clutter and noisy features as their voting will be inconsistent with the consensus. The problem of missing observations can also be overlooked as the fitted model can span multiple fragments. In general, voting is considered to be robust to outliers and missing data.
 
@@ -74,7 +74,7 @@ RANSAC algorithm was developed by Fischler and Bolles in 1981. Here's the gist:
 
 **Model Parameters**
 
-The alogrithm can be tuned with the following parameters:
+The algorithm can be tuned with the following parameters:
 
 - *n* – minimum number of points required to estimate model parameters
 - *k* – maximum number of iterations
