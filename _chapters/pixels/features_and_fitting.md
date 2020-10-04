@@ -76,10 +76,10 @@ RANSAC algorithm was developed by Fischler and Bolles in 1981. Here's the gist:
 
 The algorithm can be tuned with the following parameters:
 
-- _n_ – minimum number of points required to estimate model parameters
-- _k_ – maximum number of iterations
-- _t_ – distance threshold to determine points that fit well to model
-- _d_ – number of close points required to assert a model fits well
+- $n$ – minimum number of points required to estimate model parameters
+- $k$ – maximum number of iterations
+- $t$ – distance threshold to determine points that fit well to model
+- $d$ – number of close points required to assert a model fits well
 
 The parameter that needs most attention is _k_ – number of iterations. Next, we'll see how to determine its value.
 
@@ -89,12 +89,17 @@ Random sampling requires a minimum number of samples to be drawn to provide a hi
 
 $$ \begin{equation} P_f = (1 - W^n)^k = 1 - p \end{equation} $$
 
-where _k_ is the number of samples,  _n_ is the minimum number of points required to estimate model parameters (2 parameters for line), _W_ is the fraction of inliers, and $P_f$ represents probability of k samples failing.
+where $k$ is the number of samples,  $n$ is the minimum number of points required to estimate model parameters (e.g. line has 2 parameters), $W$ is the fraction of inliers, and $P_f$ represents probability of _k_ samples failing.
 
-Solving for _k_ gives us the minimum number of samples:
+Solving for $k$ gives us the minimum number of samples required to keep the failure rate low.
 
 $$ \begin{equation} k = \frac{\log(1 - p)}{\log(1 - W^n)} \end{equation} $$
 
+The table below shows the number of samples required for different choices of noise and model size. It's evident that $k$ increases sharply as $n$ increases.
+
+<div class="fig figcenter">
+  <img src="{{ site.baseurl }}/assets/pixels/RANSAC-number-of-iterations.png">
+</div>
 
 **Refined RANSAC**
 
