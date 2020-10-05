@@ -251,16 +251,57 @@ u \\ v
 \end{bmatrix}
 $$
   - where $M$ is a 2x2 matrix computed from image derivatives:
-  $$M =  
+  <div class="fig figcenter">
+  <img src="{{ site.baseurl }}/assets/pixels/matrixM.png">
+  </div>
+  - graphical intuition for image gradients $I_x, I_y, I_x I_y$:
+  <div class="fig figcenter">
+  <img src="{{ site.baseurl }}/assets/pixels/image-derivative.png">
+  </div>
+  - derivation: 
+  $$
+  I(x+u, y+v) \approx I(x, y) + u I_x + v I_y \; \text{(Taylor expansion)}
+  $$
+  $$
+  \begin{aligned}
+  E(u, v) &\approx \sum_{x, y} w(x, y) \left[ u I_x + v I_y \right]^2 \\
+  &= \sum_{x, y} w(x, y) \left| 
+  \begin{bmatrix} I_x & I_y \end{bmatrix} 
+  \begin{bmatrix} u \\ v \end{bmatrix} \right|^2 \\
+  &= \sum_{x, y} w(x, y) \left( 
+  \begin{bmatrix} I_x & I_y \end{bmatrix} 
+  \begin{bmatrix} u \\ v \end{bmatrix} \right)^T
+  \left( \begin{bmatrix} I_x & I_y \end{bmatrix} 
+  \begin{bmatrix} u \\ v \end{bmatrix} \right) \\
+  &= \sum_{x, y} w(x, y) 
+  \begin{bmatrix} u & v \end{bmatrix} 
+  \begin{bmatrix} I_x \\ I_y \end{bmatrix}
+  \begin{bmatrix} I_x & I_y \end{bmatrix} 
+  \begin{bmatrix} u \\ v \end{bmatrix}  \\
+  &= \sum_{x, y} w(x, y) 
+  \begin{bmatrix} u & v \end{bmatrix} 
   \begin{bmatrix}
-  u & v
+  I_x^2 & I_x I_y \\
+  I_x I_y & I_y^2
   \end{bmatrix}
+  \begin{bmatrix} u \\ v \end{bmatrix}  \\
+  &= \begin{bmatrix} u & v \end{bmatrix} \left\{
+  \sum_{x, y} w(x, y) 
+  \begin{bmatrix}
+  I_x^2 & I_x I_y \\
+  I_x I_y & I_y^2
+  \end{bmatrix} \right\}
+  \begin{bmatrix} u \\ v \end{bmatrix}  \\
+  &= \begin{bmatrix} u & v \end{bmatrix} M
+  \begin{bmatrix} u \\ v \end{bmatrix}
+  \end{aligned}
   $$
 
 - Meaning behind matrix $M$:
   <div class="fig figcenter">
   <img src="{{ site.baseurl }}/assets/pixels/axis-aligned-M.png">
   </div>
+
   - Consider an axis aligned corner, and assume $w(x, y) = 1$
   $$
   M = \sum_{x, y} 
@@ -277,33 +318,30 @@ $$
   0 & \lambda_2
   \end{bmatrix}
   $$
-  If both lambdas (eigenvalues) are large, this is indicative of a corner. 
-
-- Since M is a symmetric matrix, it can be decomposed as follows:
+  Pixels on the vertical edge will have $I_y = 0$ and $I_x^2 >> 0$ (marked in green), therefore only contributing to the $\sum I_x^2$ element in matrix $M$. Similarly, pixels on the horizontal edge will have $I_x = 0$ and $I_y^2 >> 0$ (marked in orange), therefore only contributing to the $\sum I_y^2$ element in matrix $M$. Other pixels have $I_x = 0$ and $I_y = 0$ and do not contribute to the sums in the matrix. The only non-zero elements in matrix $M$ are the diagonal elements $\sum I_x^2 = \lambda_1$ and $\sum I_y^2 = \lambda_2$.
+  - Our window contains an axis aligned corner if and only if both $\lambda_1$ and $\lambda_2$ are large. If either $\lambda$ is close to 0, then the window does not contain an axis aligned corner.
+  - In the general case, we can decompose the symmetric matrix $M$ as 
   $$
-  M = \sum_{x, y} 
-  \begin{bmatrix}
-  I_x^2 & I_x I_y \\
-  I_x I_y & I_y^2
+  M = \begin{bmatrix}
+  \sum I_x^2 & \sum I_x I_y \\
+  \sum I_x I_y & \sum I_y^2
   \end{bmatrix}
-  =
-  R^{-1}\begin{bmatrix}
+  = R^{-1} \begin{bmatrix}
   \lambda_1 & 0 \\
   0 & \lambda_2
-  \end{bmatrix}
-  R
+  \end{bmatrix} R \; \text{(eigenvalue decomposition)}
   $$
-
-  More generally, we can think of M as the matrix representation of an ellipse, 
-  with each eigenvalue representing the axis lengths and its orientation 
-  determined by R.
-
+  <div class="fig figcenter">
+  <img src="{{ site.baseurl }}/assets/pixels/rotated-M.png">
+  </div>
+  We can interpret $M$ as an ellipse with its axis length determined by the eigenvalues $\lambda_1$ and $\lambda_2$; and its orientation determined by $R$.
+  A rotated corner will have the same eigenvalues as its non-rotated version, and the rotation will be captured by the rotation matrix $R$.
+  - Interpreting the eigenvalues: 
   <div class="fig figcenter">
     <img src="{{ site.baseurl }}/assets/pixels/eigenvalue_harris.png">
   </div>
 
-  Comparing eigenvalues gives us a good indicator of distinct features of an 
-  image: 
+  Comparing eigenvalues gives us a good indicator of distinct features of an image: 
   - $\lambda_2 >> \lambda_1$ or $\lambda_1 >> \lambda_2$: **Edge**
   - $\lambda_2, \lambda_1 \approx 0$: **Flat**
   - $\lambda_2 \approx \lambda_1$: **Corner**
@@ -318,27 +356,56 @@ $$
 
    where $\alpha$ is a constant  (~$0.04 - 0.06)$. 
 
-**Window Functions**
-- Option 1: **Uniform Window**, where the function is summed over a square window: 
 
+- Window Function
+<div class="fig figcenter">
+  <img src="{{ site.baseurl }}/assets/pixels/window-function.png">
+</div>
+
+  1. Uniform window: 
+  - sum over square window
   $$
-  M = \sum_{x, y} 
-  \begin{bmatrix}
+  M = \sum_{x, y} \begin{bmatrix}
   I_x^2 & I_x I_y \\
   I_x I_y & I_y^2
   \end{bmatrix}
   $$
-  However, this is not rotation invariant. To allow for this, 
-  **Gaussian Smoothing** is a better option, where a Gaussian distribution 
-  function performs the weighted sum:
+  - problem: not rotation invariant
 
+  2. Smooth with Gaussian
+  - Gaussian already performs weighted sum
   $$
-  M = g(\sigma)* 
-  \begin{bmatrix}
+  M = g( \sigma ) * \begin{bmatrix}
   I_x^2 & I_x I_y \\
   I_x I_y & I_y^2
   \end{bmatrix}
   $$
+  - result is rotation invariant
+
+
+**Harris Detector Implementation**
+<div class="fig figcenter">
+  <img src="{{ site.baseurl }}/assets/pixels/harris-summary.png">
+</div>
+<div class="fig figcenter">
+  <img src="{{ site.baseurl }}/assets/pixels/harris-summary2.png">
+</div>
+
+1. Compute image derivatives $\Rightarrow I_x, I_y$
+2. Compute the square of image derivatives $\Rightarrow I_x^2, I_y^2, I_x I_y$
+3. Apply Gaussian filter $g(\sigma_I)$ $\Rightarrow g(I_x^2), g(I_y^2), g(I_x I_y)$
+4. Compute corner response function:
+  - compute matrix $M$ (aka. second moment matrix / autocorrelation matrix)
+  $$
+  M(\sigma_I, \sigma_D) = \begin{bmatrix}
+  I_x^2(\sigma_D) & I_x I_y(\sigma_D) \\
+  I_x I_y(\sigma_D) & I_y^2(\sigma_D)
+  \end{bmatrix}
+  $$
+  - $\sigma_D$: for Gaussian in the derivative calculation
+  - $\sigma_I$: for Gaussian in the windowing function
+  - $$\theta = \text{det}[M(\sigma_I, \sigma_D)] - \alpha \text{trace}[M(\sigma_I, \sigma_D)]^2 = g(I_x^2)g(I_y^2) - [g(I_x I_y)]^2 - \alpha [g(I_x^2) + g(I_y^2)]^2$$
+5. Perform non-maximum suppression
 
   <div class="fig figcenter">
     <img src="{{ site.baseurl }}/assets/pixels/harris_response.png">
