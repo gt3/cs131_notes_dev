@@ -205,7 +205,7 @@ Recall that we have the following goals for keypoint localization:
 
 **Examples**
 <div class="fig figcenter">
-  <img src="{{ site.baseurl }}/assets/pixels/flat-edge-corner.png">
+  <img src="{{ site.baseurl }}/assets/pixels/flat-edge-corner.PNG">
 </div>
 
 "Flat" region: no change in any direction.
@@ -230,7 +230,7 @@ $$ \begin{equation} I(x + u, y + v) - I(x, y) \end{equation} $$
 
 - This intensity difference measurement is for one single point, but we need to accumulate over the patch around that point as well. Therefore, when we shift by $[u, v]$, the change in intensity for the patch is: 
 <div class="fig figcenter">
-  <img src="{{ site.baseurl }}/assets/pixels/harris-formulation.png">
+  <img src="{{ site.baseurl }}/assets/pixels/harris-formulation.PNG">
 </div>
 
   - $\sum_{x,y}$ is the sum over the entire window / patch
@@ -252,11 +252,11 @@ u \\ v
 $$
   - where $M$ is a 2x2 matrix computed from image derivatives:
   <div class="fig figcenter">
-  <img src="{{ site.baseurl }}/assets/pixels/matrixM.png">
+  <img src="{{ site.baseurl }}/assets/pixels/matrixM.PNG">
   </div>
   - graphical intuition for image gradients $I_x, I_y, I_x I_y$:
   <div class="fig figcenter">
-  <img src="{{ site.baseurl }}/assets/pixels/image-derivative.png">
+  <img src="{{ site.baseurl }}/assets/pixels/image-derivative.PNG">
   </div>
   - derivation: 
   $$
@@ -299,7 +299,7 @@ $$
 
 - Meaning behind matrix $M$:
   <div class="fig figcenter">
-  <img src="{{ site.baseurl }}/assets/pixels/axis-aligned-M.png">
+  <img src="{{ site.baseurl }}/assets/pixels/axis-aligned-M.PNG">
   </div>
 
   - Consider an axis aligned corner, and assume $w(x, y) = 1$
@@ -332,7 +332,7 @@ $$
   \end{bmatrix} R \; \text{(eigenvalue decomposition)}
   $$
   <div class="fig figcenter">
-  <img src="{{ site.baseurl }}/assets/pixels/rotated-M.png">
+  <img src="{{ site.baseurl }}/assets/pixels/rotated-M.PNG">
   </div>
   We can interpret $M$ as an ellipse with its axis length determined by the eigenvalues $\lambda_1$ and $\lambda_2$; and its orientation determined by $R$.
   A rotated corner will have the same eigenvalues as its non-rotated version, and the rotation will be captured by the rotation matrix $R$.
@@ -359,7 +359,7 @@ $$
 
 - Window Function
 <div class="fig figcenter">
-  <img src="{{ site.baseurl }}/assets/pixels/window-function.png">
+  <img src="{{ site.baseurl }}/assets/pixels/window-function.PNG">
 </div>
 
   1. Uniform window: 
@@ -385,10 +385,10 @@ $$
 
 **Harris Detector Implementation**
 <div class="fig figcenter">
-  <img src="{{ site.baseurl }}/assets/pixels/harris-summary.png">
+  <img src="{{ site.baseurl }}/assets/pixels/harris-summary.PNG">
 </div>
 <div class="fig figcenter">
-  <img src="{{ site.baseurl }}/assets/pixels/harris-summary2.png">
+  <img src="{{ site.baseurl }}/assets/pixels/harris-summary2.PNG">
 </div>
 
 1. Compute image derivatives $\Rightarrow I_x, I_y$
@@ -407,10 +407,13 @@ $$
   - $$\theta = \text{det}[M(\sigma_I, \sigma_D)] - \alpha \text{trace}[M(\sigma_I, \sigma_D)]^2 = g(I_x^2)g(I_y^2) - [g(I_x I_y)]^2 - \alpha [g(I_x^2) + g(I_y^2)]^2$$
 5. Perform non-maximum suppression
 
+  
+  
+**Harris Detector Example** 
+ 
   <div class="fig figcenter">
     <img src="{{ site.baseurl }}/assets/pixels/harris_response.png">
   </div>
-  An example of Harris detection of an image.
 
 **Scale Invariance**
 - The Harris corner detector is *translation invariant* and *rotation invariant* (when used with a Gaussian kernel), but it is *not* **scale-invariant**. 
