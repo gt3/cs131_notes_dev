@@ -28,7 +28,7 @@ Table of contents
 
 
 <a name='ransac'></a>
-#RANSAC
+# RANSAC
 
 In this lecture, we will introduce model fitting for line detection using the RANSAC (Random Sample Consensus) algorithm.
 
@@ -167,7 +167,7 @@ Suppose we have two input images. The task is to identify whther the two images 
 The figure below summarizes each step and provides a visual description of the general approach.
 
 <div class="fig figcenter">
-  <img src="{{ site.baseurl }}/assets/pixels/lif-approach.jpeg">
+  <img src="{{ site.baseurl }}/assets/pixels/lif-approach.jpg">
 </div>
 
 The process of matching keypoints between two images is called **keypoint localization**.
