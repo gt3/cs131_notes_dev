@@ -59,20 +59,30 @@ Both Hough transform and RANSAC rely on voting to arrive at the optimum model. T
 
 **Algorithm**
 
-RANSAC algorithm was developed by Fischler and Bolles in 1981. Here's the gist:
+The RANSAC algorithm was developed by Fischler and Bolles in 1981. Here's the gist:
 
 1. Randomly sample a group of points required to fit the model
 2. Find model parameters from this sample
 3. Calculate the votes from the fraction of inliers within a predetermined threshold of the model
 4. Repeat steps 1-3 until model is found with high confidence
 
-**Algorithm Pseudocode**
+**Pseudocode**
 
 <div class="fig figcenter">
   <img src="{{ site.baseurl }}/assets/pixels/ransac-pseudocode.png">
 </div>
 
-**Model Parameters**
+**Walk-through**
+
+The algorithm starts by sampling a group of points (e.g. group of 2 points for line fitting). Model parameters (e.g. $y_i = a*x_i + b$) are derived from this group of points. This is the fitting step. Based on the fit, a number of inliers (e.g. points close to the line) is determined. The fraction of inliers from all data points attests quality of (model) fit. Models with high confidence are now refitted to all data points. This process repeats for $k$ iterations.
+
+<div class="fig figcenter">
+  <img src="{{ site.baseurl }}/assets/pixels/RANSAC-3-sample-runs.png">
+</div>
+
+An example of linear model fitting (line fitting) for 3 sample runs is shown above. Image $(c)$ has the best fit with 12 inliers.
+
+**Parameters**
 
 The algorithm can be tuned with the following parameters:
 
