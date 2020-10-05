@@ -19,6 +19,15 @@ Table of contents
   - [General Approach](#lif-general-approach)
   - [Requirements for Keypoint Localization](#lif-req-keypoint-loc)
 - [Harris Corner Detector](#harris-corner-detector)
+  - [Corners as Distinctive Interest Points](#corners-as-distinctive-interest-points)
+  - [Flat Region-Edge-Corner](#flat-region-edge-corner)
+  - [Harris Detector Formulation](#harris-detector-formulation)
+  - [Autocorrelation Matrix M](#autocorrelation-matrix-m)
+  - [Window Function](#window-function)
+  - [Harris Detector Implementation](#harris-detector-implementation)
+  - [Harris Detector Example](#harris-detector-example)
+  - [Scale Invariance](#scale-invariance)
+
 
 [//]: # (This is how you can make a comment that won't appear in the web page! It might be visible on some machines/browsers so use this only for development.)
 
@@ -193,17 +202,20 @@ Recall that we have the following goals for keypoint localization:
 - Precise localization: accurately detect keypoints in images at the correct location
 - Interesting content: areas with strong change (not in homogeneous regions, which are not distinctive and hard to match)
 
+<a name='corners-as-distinctive-interest-points'></a>
 **Corners as Distinctive Interest Points**
 - Key property of corners: In the region around a corner, the image gradient has two or more dominant directions (for instance, perpendicular gradients would represent a 90 degree angled corner). 
 - Corners are repeatable and distinctive (can be easily seen from multiple view points, and are very different from their neighbors)
 
+<a name='design-criteria'></a>
 **Design Criteria**
 
 1. Locality: when looking through a small window, we should be able to easily recognize the corner point.
 
 2. Good localization: shifting the window in any direction should give a large change in intensity.
 
-**Examples**
+<a name='flat-region-edge-corner'></a>
+**Flat Region-Edge-Corner**
 <div class="fig figcenter">
   <img src="{{ site.baseurl }}/assets/pixels/flat-edge-corner.PNG">
 </div>
@@ -219,7 +231,7 @@ Recall that we have the following goals for keypoint localization:
 - Large $\sum I_x^2$ and large $\sum I_y^2$.
 - However, multiple corners that are connected by an index produce issues because we cannot conclude the size of $\sum I_x^2$ and $\sum I_y^2$.
 
-
+<a name='harris-detector-formulation'></a>
 **Harris Detector Formulation**
 
 1. Localize patches that result in large change of intensity when shifted in any direction.
@@ -259,9 +271,11 @@ $$
   <img src="{{ site.baseurl }}/assets/pixels/image-derivative.PNG">
   </div>
   - derivation: 
+
   $$
   I(x+u, y+v) \approx I(x, y) + u I_x + v I_y \; \text{(Taylor expansion)}
   $$
+
   $$
   \begin{aligned}
   E(u, v) &\approx \sum_{x, y} w(x, y) \left[ u I_x + v I_y \right]^2 \\
@@ -297,12 +311,14 @@ $$
   \end{aligned}
   $$
 
+<a name='autocorrelation-matrix'></a>
+**Autocorrelation Matrix $M$**
 - Meaning behind matrix $M$:
   <div class="fig figcenter">
   <img src="{{ site.baseurl }}/assets/pixels/axis-aligned-M.PNG">
   </div>
 
-  - Consider an axis aligned corner, and assume $w(x, y) = 1$
+  Consider an axis aligned corner, and assume $w(x, y) = 1$
   $$
   M = \sum_{x, y} 
   \begin{bmatrix}
@@ -319,8 +335,8 @@ $$
   \end{bmatrix}
   $$
   Pixels on the vertical edge will have $I_y = 0$ and $I_x^2 >> 0$ (marked in green), therefore only contributing to the $\sum I_x^2$ element in matrix $M$. Similarly, pixels on the horizontal edge will have $I_x = 0$ and $I_y^2 >> 0$ (marked in orange), therefore only contributing to the $\sum I_y^2$ element in matrix $M$. Other pixels have $I_x = 0$ and $I_y = 0$ and do not contribute to the sums in the matrix. The only non-zero elements in matrix $M$ are the diagonal elements $\sum I_x^2 = \lambda_1$ and $\sum I_y^2 = \lambda_2$.
-  - Our window contains an axis aligned corner if and only if both $\lambda_1$ and $\lambda_2$ are large. If either $\lambda$ is close to 0, then the window does not contain an axis aligned corner.
-  - In the general case, we can decompose the symmetric matrix $M$ as 
+- Our window contains an axis aligned corner if and only if both $\lambda_1$ and $\lambda_2$ are large. If either $\lambda$ is close to 0, then the window does not contain an axis aligned corner.
+- In the general case, we can decompose the symmetric matrix $M$ as 
   $$
   M = \begin{bmatrix}
   \sum I_x^2 & \sum I_x I_y \\
@@ -336,7 +352,7 @@ $$
   </div>
   We can interpret $M$ as an ellipse with its axis length determined by the eigenvalues $\lambda_1$ and $\lambda_2$; and its orientation determined by $R$.
   A rotated corner will have the same eigenvalues as its non-rotated version, and the rotation will be captured by the rotation matrix $R$.
-  - Interpreting the eigenvalues: 
+- Interpreting the eigenvalues: 
   <div class="fig figcenter">
     <img src="{{ site.baseurl }}/assets/pixels/eigenvalue_harris.png">
   </div>
@@ -356,8 +372,8 @@ $$
 
    where $\alpha$ is a constant  (~$0.04 - 0.06)$. 
 
-
-- Window Function
+<a name='window-function'></a>
+**Window Function**
 <div class="fig figcenter">
   <img src="{{ site.baseurl }}/assets/pixels/window-function.PNG">
 </div>
@@ -382,7 +398,7 @@ $$
   $$
   - result is rotation invariant
 
-
+<a name='implementation'></a>
 **Harris Detector Implementation**
 <div class="fig figcenter">
   <img src="{{ site.baseurl }}/assets/pixels/harris-summary.PNG">
@@ -408,13 +424,14 @@ $$
 5. Perform non-maximum suppression
 
   
-  
+<a name='exmaple'></a>
 **Harris Detector Example** 
  
   <div class="fig figcenter">
     <img src="{{ site.baseurl }}/assets/pixels/harris_response.png">
   </div>
 
+<a name='scale-invariance'></a>
 **Scale Invariance**
 - The Harris corner detector is *translation invariant* and *rotation invariant* (when used with a Gaussian kernel), but it is *not* **scale-invariant**. 
 
