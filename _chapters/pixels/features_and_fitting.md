@@ -251,49 +251,11 @@ u \\ v
 \end{bmatrix}
 $$
   - where $M$ is a 2x2 matrix computed from image derivatives:
-  <div class="fig figcenter">
-  <img src="{{ site.baseurl }}/assets/pixels/matrixM.png">
-  </div>
-  - graphical intuition for image gradients $I_x, I_y, I_x I_y$:
-  <div class="fig figcenter">
-  <img src="{{ site.baseurl }}/assets/pixels/image-derivative.png">
-  </div>
-  - derivation: 
-  $$
-  I(x+u, y+v) \approx I(x, y) + u I_x + v I_y \; \text{(Taylor expansion)}
-  $$
-  \begin{align*}
-  E(u, v) &\approx \sum_{x, y} w(x, y) \left[ u I_x + v I_y \right]^2 \\
-  &= \sum_{x, y} w(x, y) \left| 
-  \begin{bmatrix} I_x & I_y \end{bmatrix} 
-  \begin{bmatrix} u \\ v \end{bmatrix} \right|^2 \\
-  &= \sum_{x, y} w(x, y) \left( 
-  \begin{bmatrix} I_x & I_y \end{bmatrix} 
-  \begin{bmatrix} u \\ v \end{bmatrix} \right)^T
-  \left( \begin{bmatrix} I_x & I_y \end{bmatrix} 
-  \begin{bmatrix} u \\ v \end{bmatrix} \right) \\
-  &= \sum_{x, y} w(x, y) 
-  \begin{bmatrix} u & v \end{bmatrix} 
-  \begin{bmatrix} I_x \\ I_y \end{bmatrix}
-  \begin{bmatrix} I_x & I_y \end{bmatrix} 
-  \begin{bmatrix} u \\ v \end{bmatrix}  \\
-  &= \sum_{x, y} w(x, y) 
-  \begin{bmatrix} u & v \end{bmatrix} 
+  $$M =  
   \begin{bmatrix}
-  I_x^2 & I_x I_y \\
-  I_x I_y & I_y^2
+  u & v
   \end{bmatrix}
-  \begin{bmatrix} u \\ v \end{bmatrix}  \\
-  &= \begin{bmatrix} u & v \end{bmatrix} \left\{
-  \sum_{x, y} w(x, y) 
-  \begin{bmatrix}
-  I_x^2 & I_x I_y \\
-  I_x I_y & I_y^2
-  \end{bmatrix} \right\}
-  \begin{bmatrix} u \\ v \end{bmatrix}  \\
-  &= \begin{bmatrix} u & v \end{bmatrix} M
-  \begin{bmatrix} u \\ v \end{bmatrix}
-  \end{align*}
+  $$
 
 - Meaning behind matrix $M$:
   <div class="fig figcenter">
@@ -315,22 +277,79 @@ $$
   0 & \lambda_2
   \end{bmatrix}
   $$
-  ixels on
+  If both lambdas (eigenvalues) are large, this is indicative of a corner. 
 
+- Since M is a symmetric matrix, it can be decomposed as follows:
+  $$
+  M = \sum_{x, y} 
+  \begin{bmatrix}
+  I_x^2 & I_x I_y \\
+  I_x I_y & I_y^2
+  \end{bmatrix}
+  =
+  R^{-1}\begin{bmatrix}
+  \lambda_1 & 0 \\
+  0 & \lambda_2
+  \end{bmatrix}
+  R
+  $$
 
+  More generally, we can think of M as the matrix representation of an ellipse, 
+  with each eigenvalue representing the axis lengths and its orientation 
+  determined by R.
 
+  <div class="fig figcenter">
+    <img src="{{ site.baseurl }}/assets/pixels/eigenvalue_harris.png">
+  </div>
 
+  Comparing eigenvalues gives us a good indicator of distinct features of an 
+  image: 
+  - $\lambda_2 >> \lambda_1$ or $\lambda_1 >> \lambda_2$: **Edge**
+  - $\lambda_2, \lambda_1 \approx 0$: **Flat**
+  - $\lambda_2 \approx \lambda_1$: **Corner**
 
+- Because calculating eigenvalues, especially for large and hi-res images, is
+   computationally expensive, the **Corner Response Function** is a widely 
+   used, fast alternative: 
 
+   $$ 
+   \theta = det(M) - \alpha trace(M)^2 = \lambda_1 \lambda_2 - \alpha (\lambda_1 + \lambda_2)^2
+   $$
 
+   where $\alpha$ is a constant  (~$0.04 - 0.06)$. 
 
+**Window Functions**
+- Option 1: **Uniform Window**, where the function is summed over a square window: 
 
+  $$
+  M = \sum_{x, y} 
+  \begin{bmatrix}
+  I_x^2 & I_x I_y \\
+  I_x I_y & I_y^2
+  \end{bmatrix}
+  $$
+  However, this is not rotation invariant. To allow for this, 
+  **Gaussian Smoothing** is a better option, where a Gaussian distribution 
+  function performs the weighted sum:
 
+  $$
+  M = g(\sigma)* 
+  \begin{bmatrix}
+  I_x^2 & I_x I_y \\
+  I_x I_y & I_y^2
+  \end{bmatrix}
+  $$
 
+  <div class="fig figcenter">
+    <img src="{{ site.baseurl }}/assets/pixels/harris_response.png">
+  </div>
+  An example of Harris detection of an image.
 
+**Scale Invariance**
+- The Harris corner detector is *translation invariant* and *rotation invariant* (when used with a Gaussian kernel), but it is *not* **scale-invariant**. 
 
+  <div class="fig figcenter">
+    <img src="{{ site.baseurl }}/assets/pixels/sift_scale_invariant.png">
+  </div>
 
-
-
-
-
+  As shown here, the Harris detector is correctly able to recognize a corner with a small set window, but can no longer identify gradients when the image is enlarged and instead incorrectly identifies edges. This is ultimately why other, scale-invariant feature detectors are used for these purposes. 
