@@ -1,6 +1,6 @@
 ---
 title: Features and fitting
-keywords: RANSAC,
+keywords: Line fitting, Voting, RANSAC
 order: 5 # Lecture number for 2020
 ---
 
@@ -55,7 +55,7 @@ Voting is a decent alternative. The idea is to have features vote for compatible
 
 ## Random Sample Consensus (RANSAC)
 
-Both Hough transform and RANSAC rely on voting to arrive at the optimum model. The part where they differ is in how the model is chosen. As the name suggests, RANSAC introduces randomness in the model selection process. A number of models are proposed until one is found that is supported by a consensus of features (voters). Let's try to understand the algorithm.
+Both Hough transform and RANSAC rely on voting to arrive at the optimum model. The part where they differ is in how the model is chosen. As the name suggests, RANSAC introduces randomness in the model selection process. A number of models are proposed until one is found that is supported by a consensus of features (voters). Let's try to understand the non-deterministic algorithm.
 
 **Algorithm**
 
@@ -95,7 +95,7 @@ Solving for $k$ gives us the minimum number of samples required to keep the fail
 
 $$ \begin{equation} k = \frac{\log(1 - p)}{\log(1 - W^n)} \end{equation} $$
 
-The table below shows the number of samples required for different choices of noise and model size. It's evident that $k$ increases sharply as $n$ increases.
+The table below summarizes the effect of of noise and model size on number of iterations $k$. In the case of line fitting if we assume 50% of data points are outliers, we'd need 17 iterations to achieve 99% success rate. It's also evident that $k$ increases sharply as $n$ increases.
 
 <div class="fig figcenter">
   <img src="{{ site.baseurl }}/assets/pixels/RANSAC-number-of-iterations.png">
