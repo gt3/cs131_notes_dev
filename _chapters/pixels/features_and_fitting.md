@@ -74,7 +74,7 @@ The RANSAC algorithm was developed by Fischler and Bolles in 1981. Here's the gi
 
 **Walk-through**
 
-The algorithm starts by sampling a group of points (e.g. group of 2 points for line fitting). Model parameters (e.g. $y_i = a*x_i + b$) are derived from this group of points. This is the fitting step. Based on the fit, a number of inliers (e.g. points close to the line) is determined. The fraction of inliers from all data points attests quality of (model) fit. Models with high confidence are now refitted to all data points. This process repeats for $k$ iterations.
+The algorithm starts by sampling a group of points (e.g. group of 2 points for line fitting). Model parameters (e.g. $y_i = a*x_i + b$) are derived from this group of points. This is the fitting step. Based on the fit, a number of inliers (e.g. points close to the line) is determined. The fraction of inliers from all data points attests quality of (model) fit. Models with high confidence are now refitted to all data points. This is the refinement step. This process repeats for $k$ iterations.
 
 <div class="fig figcenter">
   <img src="{{ site.baseurl }}/assets/pixels/RANSAC-3-sample-runs.png">
@@ -111,8 +111,9 @@ The table below summarizes the effect of of noise and model size on number of it
   <img src="{{ site.baseurl }}/assets/pixels/RANSAC-number-of-iterations.png">
 </div>
 
-**Refined RANSAC**
+## Summary
 
-**Analysis**
+From what we've learned so far, for simple to less complex models RANSAC can be computationally efficient than Hough transform. RANSAC is also space efficient as it does not keep a buffer between iterations. It is also easier to implement and measure. Overall it is a general algorithm suited for wide range of model fitting problems. On the other hand, as model complexity or percentage of outliers increases Hough transform is a better choice.
 
-**Summary**
+---
+
