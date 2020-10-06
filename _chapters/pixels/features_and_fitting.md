@@ -252,6 +252,7 @@ $$ \begin{equation} I(x + u, y + v) - I(x, y) \end{equation} $$
   - $I(x + u, y + v) - I(x, y)$ is the total intensity change for a given pixel
 
 - Approximating the change in patch intensity (with Taylor expansion):
+
 $$
 E(u, v) \approx
 \begin{bmatrix}
@@ -262,6 +263,7 @@ M
 u \\ v
 \end{bmatrix}
 $$
+
   - where $M$ is a 2x2 matrix computed from image derivatives:
   <div class="fig figcenter">
   <img src="{{ site.baseurl }}/assets/pixels/matrixM.PNG">
@@ -311,7 +313,7 @@ $$
   \end{aligned}
   $$
 
-<a name='autocorrelation-matrix'></a>
+<a name='autocorrelation-matrix-m'></a>
 **Autocorrelation Matrix $M$**
 - Meaning behind matrix $M$:
   <div class="fig figcenter">
@@ -319,6 +321,7 @@ $$
   </div>
 
   Consider an axis aligned corner, and assume $w(x, y) = 1$
+  
   $$
   M = \sum_{x, y} 
   \begin{bmatrix}
@@ -334,9 +337,11 @@ $$
   0 & \lambda_2
   \end{bmatrix}
   $$
+
   Pixels on the vertical edge will have $I_y = 0$ and $I_x^2 >> 0$ (marked in green), therefore only contributing to the $\sum I_x^2$ element in matrix $M$. Similarly, pixels on the horizontal edge will have $I_x = 0$ and $I_y^2 >> 0$ (marked in orange), therefore only contributing to the $\sum I_y^2$ element in matrix $M$. Other pixels have $I_x = 0$ and $I_y = 0$ and do not contribute to the sums in the matrix. The only non-zero elements in matrix $M$ are the diagonal elements $\sum I_x^2 = \lambda_1$ and $\sum I_y^2 = \lambda_2$.
 - Our window contains an axis aligned corner if and only if both $\lambda_1$ and $\lambda_2$ are large. If either $\lambda$ is close to 0, then the window does not contain an axis aligned corner.
 - In the general case, we can decompose the symmetric matrix $M$ as 
+
   $$
   M = \begin{bmatrix}
   \sum I_x^2 & \sum I_x I_y \\
@@ -347,9 +352,11 @@ $$
   0 & \lambda_2
   \end{bmatrix} R \; \text{(eigenvalue decomposition)}
   $$
+
   <div class="fig figcenter">
   <img src="{{ site.baseurl }}/assets/pixels/rotated-M.PNG">
   </div>
+
   We can interpret $M$ as an ellipse with its axis length determined by the eigenvalues $\lambda_1$ and $\lambda_2$; and its orientation determined by $R$.
   A rotated corner will have the same eigenvalues as its non-rotated version, and the rotation will be captured by the rotation matrix $R$.
 - Interpreting the eigenvalues: 
@@ -380,25 +387,29 @@ $$
 
   1. Uniform window: 
   - sum over square window
+  
   $$
   M = \sum_{x, y} \begin{bmatrix}
   I_x^2 & I_x I_y \\
   I_x I_y & I_y^2
   \end{bmatrix}
   $$
+
   - problem: not rotation invariant
 
   2. Smooth with Gaussian
   - Gaussian already performs weighted sum
+
   $$
   M = g( \sigma ) * \begin{bmatrix}
   I_x^2 & I_x I_y \\
   I_x I_y & I_y^2
   \end{bmatrix}
   $$
+
   - result is rotation invariant
 
-<a name='implementation'></a>
+<a name='harris-detector-implementation'></a>
 **Harris Detector Implementation**
 <div class="fig figcenter">
   <img src="{{ site.baseurl }}/assets/pixels/harris-summary.PNG">
@@ -412,19 +423,22 @@ $$
 3. Apply Gaussian filter $g(\sigma_I)$ $\Rightarrow g(I_x^2), g(I_y^2), g(I_x I_y)$
 4. Compute corner response function:
   - compute matrix $M$ (aka. second moment matrix / autocorrelation matrix)
+
   $$
   M(\sigma_I, \sigma_D) = \begin{bmatrix}
   I_x^2(\sigma_D) & I_x I_y(\sigma_D) \\
   I_x I_y(\sigma_D) & I_y^2(\sigma_D)
   \end{bmatrix}
   $$
+
   - $\sigma_D$: for Gaussian in the derivative calculation
   - $\sigma_I$: for Gaussian in the windowing function
-  - $$\theta = \text{det}[M(\sigma_I, \sigma_D)] - \alpha \text{trace}[M(\sigma_I, \sigma_D)]^2 = g(I_x^2)g(I_y^2) - [g(I_x I_y)]^2 - \alpha [g(I_x^2) + g(I_y^2)]^2$$
+  - $$\begin{aligned} \theta &= \text{det}[M(\sigma_I, \sigma_D)] - \alpha \text{trace}[M(\sigma_I, \sigma_D)]^2 \\
+  &= g(I_x^2)g(I_y^2) - [g(I_x I_y)]^2 - \alpha [g(I_x^2) + g(I_y^2)]^2 \end{aligned}$$
 5. Perform non-maximum suppression
 
   
-<a name='exmaple'></a>
+<a name='harris-detector-exmaple'></a>
 **Harris Detector Example** 
  
   <div class="fig figcenter">
@@ -436,7 +450,7 @@ $$
 - The Harris corner detector is *translation invariant* and *rotation invariant* (when used with a Gaussian kernel), but it is *not* **scale-invariant**. 
 
   <div class="fig figcenter">
-    <img src="{{ site.baseurl }}/assets/pixels/sift_scale_invariant.png">
+    <img src="{{ site.baseurl }}/assets/pixels/sift_scale_invariant.jpg">
   </div>
 
   As shown here, the Harris detector is correctly able to recognize a corner with a small set window, but can no longer identify gradients when the image is enlarged and instead incorrectly identifies edges. This is ultimately why other, scale-invariant feature detectors are used for these purposes. 
