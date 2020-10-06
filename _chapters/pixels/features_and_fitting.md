@@ -430,11 +430,13 @@ $$
   I_x I_y(\sigma_D) & I_y^2(\sigma_D)
   \end{bmatrix}
   $$
-
   - $\sigma_D$: for Gaussian in the derivative calculation
   - $\sigma_I$: for Gaussian in the windowing function
-  - $$\begin{aligned} \theta &= \text{det}[M(\sigma_I, \sigma_D)] - \alpha \text{trace}[M(\sigma_I, \sigma_D)]^2 \\
+  - corner response function: 
+
+  $$\begin{aligned} \theta &= \text{det}[M(\sigma_I, \sigma_D)] - \alpha \text{trace}[M(\sigma_I, \sigma_D)]^2 \\
   &= g(I_x^2)g(I_y^2) - [g(I_x I_y)]^2 - \alpha [g(I_x^2) + g(I_y^2)]^2 \end{aligned}$$
+
 5. Perform non-maximum suppression
 
   
