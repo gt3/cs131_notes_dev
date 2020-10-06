@@ -414,10 +414,6 @@ $$
 <div class="fig figcenter">
   <img src="{{ site.baseurl }}/assets/pixels/harris-summary.PNG">
 </div>
-<div class="fig figcenter">
-  <img src="{{ site.baseurl }}/assets/pixels/harris-summary2.PNG">
-  <div class="figcaption">(4) corner response function</div>
-</div>
 
 - (1) Compute image derivatives $\Rightarrow I_x, I_y$
 - (2) Compute the square of image derivatives $\Rightarrow I_x^2, I_y^2, I_x I_y$
@@ -440,6 +436,9 @@ $$
   &= g(I_x^2)g(I_y^2) - [g(I_x I_y)]^2 - \alpha [g(I_x^2) + g(I_y^2)]^2 \end{aligned}$$
 
 - (5) Perform non-maximum suppression
+<div class="fig figcenter">
+  <img src="{{ site.baseurl }}/assets/pixels/harris-summary2.PNG">
+</div>
 
   
 <a name='harris-detector-exmaple'></a>
