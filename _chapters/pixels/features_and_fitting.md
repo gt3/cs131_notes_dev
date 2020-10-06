@@ -426,14 +426,11 @@ $$
 <div class="fig figcenter">
   <img src="{{ site.baseurl }}/assets/pixels/harris-summary.PNG">
 </div>
-<div class="fig figcenter">
-  <img src="{{ site.baseurl }}/assets/pixels/harris-summary2.PNG">
-</div>
 
-1. Compute image derivatives $\Rightarrow I_x, I_y$
-2. Compute the square of image derivatives $\Rightarrow I_x^2, I_y^2, I_x I_y$
-3. Apply Gaussian filter $g(\sigma_I)$ $\Rightarrow g(I_x^2), g(I_y^2), g(I_x I_y)$
-4. Compute corner response function:
+- (1) Compute image derivatives $\Rightarrow I_x, I_y$
+- (2) Compute the square of image derivatives $\Rightarrow I_x^2, I_y^2, I_x I_y$
+- (3) Apply Gaussian filter $g(\sigma_I)$ $\Rightarrow g(I_x^2), g(I_y^2), g(I_x I_y)$
+- (4) Compute corner response function:
   - compute matrix $M$ (aka. second moment matrix / autocorrelation matrix)
 
   $$
@@ -445,9 +442,15 @@ $$
 
   - $\sigma_D$: for Gaussian in the derivative calculation
   - $\sigma_I$: for Gaussian in the windowing function
-  - $$\begin{aligned} \theta &= \text{det}[M(\sigma_I, \sigma_D)] - \alpha \text{trace}[M(\sigma_I, \sigma_D)]^2 \\
+  - corner response function: 
+
+  $$\begin{aligned} \theta &= \text{det}[M(\sigma_I, \sigma_D)] - \alpha \text{trace}[M(\sigma_I, \sigma_D)]^2 \\
   &= g(I_x^2)g(I_y^2) - [g(I_x I_y)]^2 - \alpha [g(I_x^2) + g(I_y^2)]^2 \end{aligned}$$
-5. Perform non-maximum suppression
+
+- (5) Perform non-maximum suppression
+<div class="fig figcenter">
+  <img src="{{ site.baseurl }}/assets/pixels/harris-summary2.PNG">
+</div>
 
   
 <a name='harris-detector-exmaple'></a>
